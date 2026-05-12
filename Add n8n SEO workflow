@@ -1,0 +1,158 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b6d3efca-d96c-425b-9acb-2120efdedc51",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6f210a7c-c516-456f-9860-dca764d36c78",
+              "name": "keyword",
+              "value": "Chamomile tea benefits",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "38ca2c17-1bc2-472d-9152-c1b0b0e8f9ee",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "=POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"llama-3.3-70b-versatile\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are an SEO expert for Herbs Are My World, a herbal wellness brand. Output only valid JSON.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Write a complete SEO article for keyword: {{ $json.keyword }}. Return JSON with keys: seo_title, meta_description, url_slug, focus_keyword, related_keywords, article_content, image_alt_texts, faqs, faq_schema. Include 7 FAQs. Article should be 1000+ words.\"\n    }\n  ],\n  \"temperature\": 0.7,\n  \"response_format\": {\"type\": \"json_object\"}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "8637d9f0-97b4-4473-8754-998b4f778fa9",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "60YsBOFDa5VpxJWW",
+          "name": "Header Auth account 3"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        144,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "5ec39748-af3c-4251-b066-8e8c32d380b7",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        144,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "9706331b-140f-44cb-91bb-8f32367f7d77",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        144,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "b51474c2-809d-48ef-9588-37f78def7bf3",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {
+    "When clicking ‘Execute workflow’": [
+      {
+        "json": {},
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "a02aad69-3c97-4e8b-92a0-473841682f65",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "62f011ca2aeaf46ed86f8fb1321812aa1f241c6bfaa079e1b71ea348d3e39fa0"
+  },
+  "id": "X17Kq0QfmKnnHUdU",
+  "tags": []
+}
