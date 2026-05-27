@@ -1,0 +1,508 @@
+{
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1216,
+        -16
+      ],
+      "id": "f1744880-b0b7-468b-aea5-bc6c7e2069f2",
+      "name": "When clicking 'Execute workflow'"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "058fd412-eb54-40ad-a0cf-6bc5f82614b2",
+              "name": "keyword",
+              "value": "Act like professional experience with 20 years in the best  university hospital ad write an articel about liver and healthy and unhealthy food, how u can heal it with herbal remeady",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1008,
+        -16
+      ],
+      "id": "5b683064-73ea-45fd-a877-3e5fb8b9da9e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -800,
+        -16
+      ],
+      "id": "44a8c554-90c0-45b5-b202-d636d168589b",
+      "name": "Wait",
+      "webhookId": "af1dcfef-d24c-4e86-a8bb-360f6a1effbc"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"api_key\": \"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\",\n  \"query\": \"{{ $('Edit Fields').first().json.keyword }}\",\n  \"search_depth\": \"basic\",\n  \"max_results\": 8,\n  \"include_domains\": [\n    \"reddit.com\",\n    \"healthline.com\",\n    \"webmd.com\",\n    \"medicalnewstoday.com\",\n    \"wikipedia.org\",\n    \"mayoclinic.org\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -640,
+        -16
+      ],
+      "id": "d67f3542-2275-451e-a95a-fe8489437129",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nconst results = data.results || [];\n\nlet articles = [];\nlet reddit = [];\n\nfor (const r of results) {\n  const item = {\n    title: r.title || '',\n    url: r.url || '',\n    snippet: (r.content || '').substring(0, 300)\n  };\n  \n  if (r.url && r.url.includes('reddit.com')) {\n    reddit.push(item);\n  } else {\n    articles.push(item);\n  }\n}\n\nreturn [{\n  json: {\n    keyword: $('Edit Fields').first().json.keyword,\n    articles: articles,\n    reddit: reddit,\n    totalArticles: articles.length,\n    totalReddit: reddit.length\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -352,
+        0
+      ],
+      "id": "625508dc-ef90-4f11-95cd-d28fa88d85d7",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a professional content writer. Write an article using ONLY the data below.\n\nKEYWORD: {{ $json.keyword }}\n\nARTICLES ({{ $json.totalArticles }} found):\n{{ JSON.stringify($json.articles) }}\n\nREDDIT POSTS ({{ $json.totalReddit }} found):\n{{ JSON.stringify($json.reddit) }}\n\nSTRICT RULES:\n- Article must be about: {{ $json.keyword }}\n- Use ONLY real URLs from data above\n- Use ONLY real Reddit titles from data above\n- DO NOT invent fake links\n\nCreate the article:\n\n# [Title about {{ $json.keyword }}]\n\n## Introduction\n[2 paragraphs about {{ $json.keyword }}]\n\n## Main Content\n[4-5 paragraphs using ARTICLES data]\n\n## Key Benefits\n- Point 1\n- Point 2\n- Point 3\n- Point 4\n- Point 5\n\n## FAQs\n**Q1: [Question]?**\nA: [Answer]\n\n**Q2: [Question]?**\nA: [Answer]\n\n**Q3: [Question]?**\nA: [Answer]\n\n## Reddit Discussions\nUse REAL Reddit titles from REDDIT POSTS above:\n- [Real title 1]\n- [Real title 2]\n- [Real title 3]\n\n## Reference Links\nUse REAL URLs from ARTICLES above:\n1. [Title] - [URL]\n2. [Title] - [URL]\n3. [Title] - [URL]\n4. [Title] - [URL]\n5. [Title] - [URL]\n\n## Conclusion\n[Brief summary]\n\nKeep under 2500 characters.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -16,
+        -32
+      ],
+      "id": "40a5a6cc-53f9-4bf6-affb-1a6a1b1621da",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {
+          "maxTokensToSample": 4000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        192
+      ],
+      "id": "f08b346b-3cb6-4c0c-a6a3-53ac6ace0e8a",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "KGoLnObwpi4ciEnX",
+          "name": "Groq account 9"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "app0YXAtpSOJHeaEK",
+          "mode": "list"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbltgULyq6RyhNQk3",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "keyword": "={{ $('Edit Fields').first().json.keyword }}",
+            "Article": "={{ $('Basic LLM Chain').first().json.text }}",
+            "date": "={{ $now.toFormat('yyyy-MM-dd') }}",
+            "Status": "Done"
+          }
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        352,
+        0
+      ],
+      "id": "051a3bad-a5ba-43da-a39b-129d73504dbc",
+      "name": "Create a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "iccjdwrcfJJC7ofH",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const article = $('Basic LLM Chain').first().json.text;\nconst keyword = $('Edit Fields').first().json.keyword;\n\nlet message = `📚 Article: ${keyword}\\n\\n${article}`;\n\nif (message.length > 4000) {\n  message = message.substring(0, 3900) + \"\\n\\n...(truncated - full article in Airtable)\";\n}\n\nreturn [{ json: { message: message, fullArticle: article, keyword: keyword } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        32
+      ],
+      "id": "356436cc-8f2b-482c-8de0-88977e8d97b3",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "chatId": "8743677735",
+        "text": "={{ $json.message }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        864,
+        32
+      ],
+      "id": "bc2b0419-14a6-496b-a12e-f5eb01ba91bc",
+      "name": "Send a text message",
+      "webhookId": "406fc4f0-bf36-445c-9118-99eb42784539",
+      "credentials": {
+        "telegramApi": {
+          "id": "PcoYRZdms1CfxiOF",
+          "name": "Telegram account 6"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get article from Basic LLM Chain (the original article, not Telegram response)\nconst article = $('Basic LLM Chain').first().json.text;\n\nif (!article || article.length < 50) {\n  throw new Error('No article found in Basic LLM Chain');\n}\n\nconst languages = [\n  { name: 'Greek',   flag: '🇬🇷' },\n  { name: 'Tamil',   flag: '🇮🇳' },\n  { name: 'Spanish', flag: '🇪🇸' },\n  { name: 'French',  flag: '🇫🇷' },\n  { name: 'German',  flag: '🇩🇪' },\n  { name: 'Hindi',   flag: '🇮🇳' }\n];\n\nreturn languages.map(lang => ({\n  json: {\n    language: lang.name,\n    flag: lang.flag,\n    prompt: 'You are a professional translator. Translate the entire article below into ' + lang.name + '.\\n\\nSTRICT RULES:\\n- Translate EVERY section: Title, Introduction, Main Content, Key Benefits, FAQs, Reddit Discussions, Reference Links, Conclusion\\n- Keep ALL markdown formatting (##, **, -, numbered lists)\\n- Keep ALL URLs UNCHANGED\\n- Translate section headers into ' + lang.name + '\\n- Do NOT add comments like \"Here is the translation\"\\n- Return ONLY the complete translated article\\n\\nARTICLE:\\n\\n' + article\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1088,
+        32
+      ],
+      "id": "b9a34550-19cb-4eac-acbb-5da1235ed103",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1296,
+        32
+      ],
+      "id": "bb83cb4d-62cb-4b4d-a9f3-254498e3f092",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "amount": 20
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1504,
+        32
+      ],
+      "id": "9618c5b8-62c7-4786-aab3-c3c3a619c8ea",
+      "name": "Wait1",
+      "webhookId": "9dddf066-7443-47f2-8f31-fb46d7cb1c8c"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1712,
+        32
+      ],
+      "id": "16d638af-322b-4edb-bc56-615b170b042d",
+      "name": "Basic LLM Chain1",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 70000,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {
+          "maxTokensToSample": 4000,
+          "temperature": 0.3
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1648,
+        256
+      ],
+      "id": "0a15e174-2625-4a9e-984e-8f680dc7cd2c",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "KGoLnObwpi4ciEnX",
+          "name": "Groq account 9"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst translated = String(item.text || item.output || '').trim();\n\n// Get current loop language from Code in JavaScript2\nconst loopIndex = $('Loop Over Items').context.currentRunIndex || 0;\nconst js2Data = $('Code in JavaScript2').all();\nconst langInfo = js2Data[loopIndex] ? js2Data[loopIndex].json : { language: 'Unknown', flag: '🌐' };\n\nlet msg = langInfo.flag + ' ' + langInfo.language + ' Translation\\n';\nmsg += '━━━━━━━━━━━━━━━\\n\\n';\nmsg += translated;\n\n// Telegram limit is 4096 chars\nif (msg.length > 4000) {\n  msg = msg.substring(0, 3990) + '...';\n}\n\nreturn [{\n  json: {\n    message: msg,\n    language: langInfo.language\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        32
+      ],
+      "id": "19907b58-a514-4f8c-af19-60660b876259",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "chatId": "8743677735",
+        "text": "={{ $json.message }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2128,
+        32
+      ],
+      "id": "78ce492c-f972-47f1-bbfd-bfb459f4baf2",
+      "name": "Send a text message1",
+      "webhookId": "188b24b2-d01c-4a1a-bbb8-feb155886322",
+      "credentials": {
+        "telegramApi": {
+          "id": "PcoYRZdms1CfxiOF",
+          "name": "Telegram account 6"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Create a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a record": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0e2f413562a5c14ae8e54e2133826249156134886eded6ab9302e3b059251d98"
+  }
+}
