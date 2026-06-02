@@ -1,0 +1,579 @@
+{
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2064,
+        240
+      ],
+      "id": "f1744880-b0b7-468b-aea5-bc6c7e2069f2",
+      "name": "When clicking 'Execute workflow'"
+    },
+    {
+      "parameters": {
+        "chatId": "8743677735",
+        "text": "={{ $json.text }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1216,
+        304
+      ],
+      "id": "bc2b0419-14a6-496b-a12e-f5eb01ba91bc",
+      "name": "Send a text message",
+      "webhookId": "406fc4f0-bf36-445c-9118-99eb42784539",
+      "credentials": {
+        "telegramApi": {
+          "id": "PcoYRZdms1CfxiOF",
+          "name": "Telegram account 6"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b4fd697e-d927-425c-8d7a-f647617d0c9c",
+              "name": "keyword",
+              "value": "best mobile in the world suggest me only one phone",
+              "type": "string"
+            },
+            {
+              "id": "0782eee4-fb7a-4414-af6f-333ae9525ed4",
+              "name": "languages",
+              "value": "tamil, greek, english, deutsch",
+              "type": "string"
+            },
+            {
+              "id": "2ed33c25-2a5b-408c-994c-95d40b84d5b9",
+              "name": "word count",
+              "value": "700",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1856,
+        240
+      ],
+      "id": "c913b8c3-d7e2-4b19-bf16-833facb9634e",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {
+          "maxTokensToSample": 2000,
+          "temperature": 1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -1344,
+        576
+      ],
+      "id": "472ed0ca-4dec-4ca5-948d-0abb6c1bf531",
+      "name": "Groq Chat Model3",
+      "credentials": {
+        "groqApi": {
+          "id": "KGoLnObwpi4ciEnX",
+          "name": "Groq account 9"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -656,
+        288
+      ],
+      "id": "153f7365-4195-44e8-b656-f9bbce9e8d47",
+      "name": "Wait4",
+      "webhookId": "1287f25e-f8e5-4fae-a943-58010dfa8f8e"
+    },
+    {
+      "parameters": {
+        "promptType": "=define",
+        "text": "=Write a 500-word messy blog post about: {{ $json.keyword }}\n\nYou are a 19-year-old college student writing at 10am. You're tired but you're going to write a STRUCTURED blog post — even though you're messy, you still have intro, body, conclusion.\n\n📝 MANDATORY STRUCTURE (3 PARTS):\n\n═══ PART 1: INTRO (1 paragraph, 4-5 sentences) ═══\n- Start with \"Ok so,\" or \"Look,\" or \"Honestly,\"\n- Hook the reader with personal touch\n- Introduce {{ $json.keyword }}\n- Tease what's coming\n- Add 1 personal opinion\n\n═══ PART 2: BODY (3 paragraphs, 5-6 sentences each) ═══\n\nBODY 1 (What it is):\n- Explain what {{ $json.keyword }} is\n- Add casual background\n- Mention \"my mom\" or \"my friend\" once\n- Add 2 short sentences (\"True.\" \"Yeah.\")\n\nBODY 2 (Benefits/Why it matters):\n- List 3-4 benefits in flowing way (NOT bullets)\n- Add personal experience\n- Add 1 self-doubt: \"I'm not 100% sure but...\"\n- Add em-dashes — like this —\n\nBODY 3 (How to use it):\n- Practical tips\n- Real examples\n- Add fillers (kinda, you know, tbh)\n- Add 1 rhetorical question\n\n═══ PART 3: CONCLUSION (1 paragraph, 3-4 sentences) ═══\n- Wrap up casually\n- Don't say \"In conclusion\"\n- Use: \"So yeah,\" or \"Honestly,\" or \"That's ",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -1024,
+        240
+      ],
+      "id": "21e7e364-f7de-4874-bf00-12870d5ef6c5",
+      "name": "Draft Writer"
+    },
+    {
+      "parameters": {
+        "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+        "options": {
+          "maxTokensToSample": 2000,
+          "temperature": 0.9
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -528,
+        544
+      ],
+      "id": "42c98c3e-a2c0-4380-afad-23a3884d4a18",
+      "name": "Groq Chat Model4",
+      "credentials": {
+        "groqApi": {
+          "id": "KGoLnObwpi4ciEnX",
+          "name": "Groq account 9"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const httpResponse = $input.first().json;\nlet keyword = '';\n\ntry {\n  keyword = $('Edit Fields1').first().json.keyword || 'topic';\n} catch (e) {\n  keyword = 'topic';\n}\n\n// Parse Wikipedia API response\nlet research = '';\n\ntry {\n  if (httpResponse.query && httpResponse.query.pages) {\n    const pages = httpResponse.query.pages;\n    const pageId = Object.keys(pages)[0];\n    \n    if (pages[pageId] && pages[pageId].extract) {\n      research = pages[pageId].extract;\n    }\n  }\n} catch (e) {\n  research = '';\n}\n\n// Fallback\nif (!research || research.length < 100) {\n  research = `${keyword} - write about this topic with detailed information including names, facts, and specific examples.`;\n}\n\n// Limit length\nif (research.length > 2500) {\n  research = research.substring(0, 2500) + '...';\n}\n\nreturn [{\n  json: {\n    keyword: keyword,\n    research: research\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1440,
+        240
+      ],
+      "id": "2adb7aee-fefb-49b3-9ccc-665483373211",
+      "name": "Clean data"
+    },
+    {
+      "parameters": {
+        "url": "=https://en.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&exintro=&explaintext=&titles={{ encodeURIComponent($json.keyword) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1648,
+        240
+      ],
+      "id": "54c9c4ed-c0bb-483d-bf9b-296ff70781aa",
+      "name": "Free Research"
+    },
+    {
+      "parameters": {
+        "jsCode": "let text = $input.first().json.text || $input.first().json.output || '';\n\n// Remove think tags\ntext = text.replace(/<think>[\\s\\S]*?<\\/think>/gi, '');\ntext = text.replace(/<\\/?think>/gi, '');\ntext = text.replace(/\\*\\*/g, '').replace(/##/g, '').trim();\n\n// ⚡ 1. Inject 5 TYPOS\nconst typoPairs = [\n  ['the', 'teh'],\n  ['and', 'adn'],\n  ['that', 'taht'],\n  ['with', 'wiht'],\n  ['from', 'form'],\n  ['your', 'yuor'],\n  ['have', 'ahve'],\n  ['this', 'tihs'],\n  ['just', 'jsut'],\n  ['know', 'knwo']\n];\n\nconst used = new Set();\nfor (let i = 0; i < 5; i++) {\n  let attempts = 0;\n  while (attempts < 8) {\n    const t = typoPairs[Math.floor(Math.random() * typoPairs.length)];\n    if (!used.has(t[0])) {\n      const regex = new RegExp('\\\\b' + t[0] + '\\\\b');\n      if (text.match(regex)) {\n        text = text.replace(regex, t[1]);\n        used.add(t[0]);\n        break;\n      }\n    }\n    attempts++;\n  }\n}\n\n// ⚡ 2. Replace AI phrases\nconst aiToHuman = {\n  'It is important to note': 'btw,',\n  'In conclusion': 'so yeah,',\n  'Moreover': 'plus,',\n  'Furthermore': 'also,',\n  'Additionally': 'and,',\n  'Therefore': 'so',\n  'However': 'but',\n  'Nevertheless': 'still,',\n  'utilize': 'use',\n  'numerous': 'lots of',\n  'various': 'different',\n  'demonstrate': 'show',\n  'facilitate': 'help',\n  'beneficial': 'good',\n  'essential': 'needed',\n  'significant': 'big',\n  'enhance': 'boost',\n  'comprehensive': 'full',\n  'consume': 'eat',\n  'research shows': 'people say',\n  'studies indicate': 'I heard'\n};\n\nfor (const [ai, human] of Object.entries(aiToHuman)) {\n  const regex = new RegExp('\\\\b' + ai + '\\\\b', 'gi');\n  text = text.replace(regex, human);\n}\n\n// ⚡ 3. Insert 5 fillers\nconst fillers = [\n  ' — honestly — ',\n  ' (you know?) ',\n  ' kinda ',\n  ' I mean, ',\n  ' like, ',\n  ' (at least I think) ',\n  ' — which is wild — ',\n  ' basically ',\n  ' tbh ',\n  ' — no joke — ',\n  ' ngl, '\n];\n\nconst sentences = text.split('. ');\nif (sentences.length > 5) {\n  const positions = [\n    Math.floor(sentences.length * 0.15),\n    Math.floor(sentences.length * 0.30),\n    Math.floor(sentences.length * 0.50),\n    Math.floor(sentences.length * 0.70),\n    Math.floor(sentences.length * 0.85)\n  ];\n  \n  positions.forEach(pos => {\n    if (pos < sentences.length && pos > 0) {\n      const filler = fillers[Math.floor(Math.random() * fillers.length)];\n      sentences[pos] = sentences[pos] + filler;\n    }\n  });\n  \n  text = sentences.join('. ');\n}\n\n// ⚡ 4. Force casual opener\nif (!text.match(/^(Ok|Look|Honestly|So|Hey|Listen)/i)) {\n  const openers = ['Look, ', 'Honestly, ', 'Ok so, ', 'So basically, '];\n  const opener = openers[Math.floor(Math.random() * openers.length)];\n  text = opener + text.charAt(0).toLowerCase() + text.slice(1);\n}\n\n// ⚡ 5. Insert short punchy sentences between paragraphs\nconst shortInserts = [\n  ' Yeah.',\n  ' True.',\n  ' Wild.',\n  ' Crazy.',\n  ' I know.',\n  ' Felt that.',\n  ' Honestly.',\n  ' For real.',\n  ' No joke.',\n  ' Right?'\n];\n\nconst paragraphs = text.split('\\n\\n');\nif (paragraphs.length > 2) {\n  for (let i = 0; i < paragraphs.length - 1; i++) {\n    if (Math.random() > 0.4) {\n      paragraphs[i] = paragraphs[i] + shortInserts[Math.floor(Math.random() * shortInserts.length)];\n    }\n  }\n  text = paragraphs.join('\\n\\n');\n}\n\n// ⚡ 6. Random punctuation chaos\nconst sents = text.split('. ');\nif (sents.length > 6) {\n  const pos1 = Math.floor(Math.random() * sents.length);\n  sents[pos1] = sents[pos1] + '...';\n  \n  const pos2 = Math.floor(Math.random() * sents.length);\n  if (pos2 !== pos1) sents[pos2] = sents[pos2] + '!';\n  \n  const pos3 = Math.floor(Math.random() * sents.length);\n  if (pos3 !== pos1 && pos3 !== pos2) sents[pos3] = sents[pos3] + '??';\n  \n  text = sents.join('. ');\n}\n\n// ⚡ 7. Add casual ending\nconst endings = ['\\n\\nAnyway.', '\\n\\nYeah, that\\'s it really.', '\\n\\nIdk.', '\\n\\nJust saying.'];\ntext = text + endings[Math.floor(Math.random() * endings.length)];\n\n// Cleanup\ntext = text.replace(/\\s+\\./g, '.');\ntext = text.replace(/\\s+,/g, ',');\ntext = text.replace(/\\.\\.\\.\\./g, '...');\ntext = text.replace(/\\s{2,}/g, ' ');\ntext = text.replace(/\\n{3,}/g, '\\n\\n');\ntext = text.trim();\n\nreturn [{ json: { text: text } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -128,
+        256
+      ],
+      "id": "5fe7e5cf-459a-4f76-9a89-5c485fc610d1",
+      "name": "Inject Human Randomness"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Make this article MESSIER and MORE HUMAN.\n\nARTICLE:\n{{ $json.text }}\n\nADD:\n- Cut long sentences into 2-3 short ones\n- 5 more short sentences: \"Yeah.\" \"True.\" \"Wild.\" \"I know.\"\n- 3 more opinions: \"I honestly think...\"\n- 2 more questions: \"Right?\" \"You know?\"\n- More fillers: kinda, you know, I mean, tbh, ngl\n\nKEEP same topic, all facts, same length.\n\nNEVER: bullets, headers, <think> tags\n\nOutput messier article.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -480,
+        256
+      ],
+      "id": "bd9b7c50-1e34-4c94-9b20-c4eab390d9bd",
+      "name": "Humanizer pass 1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1232,
+        240
+      ],
+      "id": "2d74c5b3-c8a0-4ec8-88a1-3256c6d6639a",
+      "name": "Wait5",
+      "webhookId": "e0e1bc95-dc16-46a6-808b-4e929d47f23a"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        480,
+        256
+      ],
+      "id": "c43b1f76-e86a-43c1-894e-d9b41004fdbe",
+      "name": "Wait6",
+      "webhookId": "4be4971b-556c-4122-a608-fa16ffbaad71"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {
+          "maxTokensToSample": 2500,
+          "temperature": 0.9
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        208,
+        592
+      ],
+      "id": "2fd4a5e7-aba1-4ee2-b2f8-5cdca8cbffc8",
+      "name": "Groq Chat Model6",
+      "credentials": {
+        "groqApi": {
+          "id": "KGoLnObwpi4ciEnX",
+          "name": "Groq account 9"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Make this article EVEN MESSIER. More chaos. More personality.\n\nARTICLE:\n{{ $json.text }}\n\nADD:\n1. 3 more short sentences (\"Right?\" \"True.\" \"Wild.\")\n2. 2 more em-dashes — like this —\n3. 2 more parentheses (asides)\n4. 1 self-correction: \"Wait, actually...\"\n5. 1 admission: \"Honestly idk\"\n\nKEEP all typos, all fillers, casual style.\n\nNEVER: fix typos, formal language, bullets, headers, <think> tags\n\nOutput messier article.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        80,
+        256
+      ],
+      "id": "485b2be9-b608-4983-8d58-bd1501e10ff4",
+      "name": "Final Humanizer"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "app0YXAtpSOJHeaEK",
+          "mode": "list"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbltgULyq6RyhNQk3",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "keyword": "=Title: {{ $json.keyword }}\nContent: {{ $json.fullArticle }}\nWords: {{ $json.wordCount }}",
+            "Article": "={{ $('Basic LLM Chain').first().json.text }}",
+            "date": "={{ $now.toFormat('yyyy-MM-dd') }}",
+            "Status": "Done"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "keyword",
+              "displayName": "keyword",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Article",
+              "displayName": "Article",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Todo",
+                  "value": "Todo"
+                },
+                {
+                  "name": "In progress",
+                  "value": "In progress"
+                },
+                {
+                  "name": "Done",
+                  "value": "Done"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Attachments",
+              "displayName": "Attachments",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Attachment Summary",
+              "displayName": "Attachment Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        992,
+        -848
+      ],
+      "id": "051a3bad-a5ba-43da-a39b-129d73504dbc",
+      "name": "Create a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "iccjdwrcfJJC7ofH",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let text = $input.first().json.text || '';\n\n// Remove think tags\ntext = text.replace(/<think>[\\s\\S]*?<\\/think>/gi, '');\ntext = text.replace(/<\\/?think>/gi, '');\ntext = text.replace(/<thinking>[\\s\\S]*?<\\/thinking>/gi, '');\n\n// Remove AI reasoning\ntext = text.replace(/^(Okay|Alright|Let me|Let's see|Here is|Here's|Sure)[^.]*\\.\\s*/gi, '');\n\n// Clean markdown\ntext = text.replace(/\\*\\*/g, '').replace(/##/g, '').replace(/###/g, '').trim();\n\n// Remove any existing title formatting\ntext = text.replace(/^📝[^\\n]*\\n+/g, '');\ntext = text.replace(/━+\\n?/g, '');\ntext = text.replace(/#\\w+\\s*$/gm, '');\n\n// Fix punctuation\ntext = text.replace(/\\s+\\./g, '.');\ntext = text.replace(/\\s+,/g, ',');\ntext = text.replace(/\\s{2,}/g, ' ');\ntext = text.replace(/\\n{3,}/g, '\\n\\n');\ntext = text.trim();\n\n// Add title + hashtag\nconst keyword = $('Edit Fields1').first().json.keyword || 'topic';\n\nconst titles = [\n  `My Thoughts On ${keyword}`,\n  `${keyword} — Honestly Pretty Good`,\n  `Real Talk About ${keyword}`,\n  `Why I Love ${keyword}`,\n  `${keyword}: A Quick Take`,\n  `${keyword} — Worth It Or Nah?`\n];\nconst title = titles[Math.floor(Math.random() * titles.length)];\n\nconst formatted = `📝 ${title}\n\n━━━━━━━━━━━━━━━━━━━\n\n${text}\n\n━━━━━━━━━━━━━━━━━━━\n#${keyword.replace(/\\s+/g, '')}`;\n\nlet finalText = formatted;\nif (finalText.length > 4000) {\n  finalText = finalText.substring(0, 4000) + '...';\n}\n\nreturn [{ json: { text: finalText } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        256
+      ],
+      "id": "e8ff0e6f-2b46-4d92-a1d0-c8764ba144a3",
+      "name": "Final Cleanup"
+    }
+  ],
+  "connections": {
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Free Research",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Draft Writer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait4": {
+      "main": [
+        [
+          {
+            "node": "Humanizer pass 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft Writer": {
+      "main": [
+        [
+          {
+            "node": "Wait4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Humanizer pass 1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean data": {
+      "main": [
+        [
+          {
+            "node": "Wait5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Free Research": {
+      "main": [
+        [
+          {
+            "node": "Clean data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inject Human Randomness": {
+      "main": [
+        [
+          {
+            "node": "Final Humanizer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Humanizer pass 1": {
+      "main": [
+        [
+          {
+            "node": "Inject Human Randomness",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait5": {
+      "main": [
+        [
+          {
+            "node": "Draft Writer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait6": {
+      "main": [
+        [
+          {
+            "node": "Final Cleanup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model6": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Final Humanizer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final Humanizer": {
+      "main": [
+        [
+          {
+            "node": "Wait6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final Cleanup": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0e2f413562a5c14ae8e54e2133826249156134886eded6ab9302e3b059251d98"
+  }
+}
