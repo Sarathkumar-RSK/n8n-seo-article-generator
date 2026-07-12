@@ -1,6 +1,7 @@
 # n8n-seo-article-generator
 AI-powered SEO article automation using n8n + Groq AI (Llama 3.3) for Herbs Are My World - a herbal wellness brand in Cyprus
 # 🌿 AI-Powered SEO Article Generator
+<img width="794" height="162" alt="image" src="https://github.com/user-attachments/assets/c09eac27-8c65-40b1-a8bf-1455a14a4e6a" />
 
 > **Automated SEO content generation system built with n8n + Groq AI for Herbs Are My World — a premium herbal wellness brand based in Cyprus 🇨🇾**
 
